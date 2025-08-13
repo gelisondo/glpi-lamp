@@ -1,0 +1,11 @@
+---
+# handlers file for glpi-lamp
+# handlers file for apache2-role
+- name: check apache2 config
+  command: apachectl configtest
+  register: result
+
+- name: restart apache2
+  become: yes
+  service: name=apache2 state=restarted
+  # when: result|Syntax OK

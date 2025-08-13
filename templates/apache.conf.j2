@@ -1,0 +1,21 @@
+<VirtualHost *:{{ http_port }}>
+
+   ServerAdmin {{ server_admin }}
+   ServerName {{ http_host }}.{{ http_domain }}
+   ServerAlias {{ http_host }}.{{ http_domain }}
+   DocumentRoot /var/www/html/glpi/public
+
+   <Directory /var/www/html/glpi/public>
+      Options Indexes FollowSymLinks MultiViews
+      AllowOverride All
+      Order allow,deny
+      Allow from all
+   </Directory>
+
+   RewriteEngine on
+   RewriteCond %{SERVER_NAME} ={{ http_host }}.{{ http_domain }}
+   RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+
+   ErrorLog ${APACHE_LOG_DIR}/error.log
+   CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>

@@ -1,0 +1,59 @@
+---
+
+# tasks file for MySQL
+- name: Install mysql
+  apt: pkg={{ item }} state=present
+  with_items: "{{ mysql.packages }}"
+  when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bulseye") or
+        (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bookworm") or
+        (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_release'] == "focal")
+
+- name: Asegurarse de que mysql esté corriendo y habilitado al inicio.
+  service: name=mysql state=started enabled=yes
+
+##1) Creamos la DB
+- name: Creamos una nueva DB para GLPI.
+  community.mysql.mysql_db:
+    login_user: root
+    login_password: ""
+    login_host: localhost
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: "{{ item.value.glpi_mysql_db }}"
+    state: present
+  become: yes
+  loop: "{{ site_config_install|dict2items }}"
+
+##2) Creamos El usuario y la DB le asignamos todos los privilegios.
+- name: Creamos usuario MySql y Atorgamos todos los privilegios sobre la DB para WP.
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: ""
+    login_host: localhost
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: "{{ item.value.glpi_mysql_user }}"
+    password: "{{ item.value.glpi_mysql_password }}"
+    priv: '{{ item.value.glpi_mysql_db }}.*:ALL,GRANT'
+    state: present
+  become: yes
+  loop: "{{ site_config_install|dict2items }}"
+
+##3) Subimos el Backups de base de datos al servidor
+- name: Extract Dump Mysql Bk
+  ansible.builtin.unarchive:
+    src: "{{ inventory_dir }}/host_vars/{{ ansible_limit }}/files/{{ BackupDB }}"
+    dest: /tmp/
+    owner: root
+    group: root
+    extra_opts: ["--overwrite"]
+
+##4) Restauramos la base de datos
+- name: Restore database
+  community.mysql.mysql_db:
+    login_user: '{{ db_user }}'
+    login_password: '{{ db_pass }}'
+    login_host: localhost
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: "{{ item.value.glpi_mysql_db }}"
+    state: import
+    target: /tmp/{{ item.value.glpi_mysql_db }}.sql
+  loop: "{{ site_config_install|dict2items }}"

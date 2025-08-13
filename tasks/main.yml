@@ -1,0 +1,19 @@
+---
+
+# - name: debug
+#   debug:
+#     msg: "{{ inventory_dir }}/host_vars/{{ ansible_limit }}/files/letsencrypt.tar.gz"
+
+# Tasks file for glpi-lamp
+- import_tasks: installDependencias.yml
+  tags:
+    - glpi-lamp
+    - dependencias
+
+- import_tasks: installDB.yml
+  tags:
+    - glpi-lamp
+
+- import_tasks: ConfigApachePHP.yml
+  tags:
+    - glpi-lamp

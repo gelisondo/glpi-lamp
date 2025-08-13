@@ -1,0 +1,38 @@
+---
+# defaults file for glpi-lamp
+
+
+# Versiones de php seleccionada para la instalación:
+# Puedes optar por la versión 8.2 o 8.3
+php_version: 8.2
+
+
+# Listas de extensiones de PHP a activar
+php_extensions:
+  - intl
+  - mysqli
+
+
+## - Variables para la configuración del VirtualHost
+## - Podes comentar esta sección y definir estas varibales en tu host_vars
+# http_port: 80
+# server_admin: "admin@example.com"
+# http_domain: "example.com"
+# http_host: "glpi"
+
+## - Variables para la configuración de la base de datos
+## - PUedes escribir los datos sensibles directamente en este archivo, pero es recomendable que utilices el Vault para los secretos
+# site_config_install:
+#   db:
+#     glpi_mysql_db: "default"
+#     glpi_mysql_user: "default"
+#     glpi_mysql_password: "{{ vault_glpi_mysql_password }}"
+
+## Archivos de BK
+
+# # Definimos el nombre del archivo de backup de GLPI
+# BackupGLPI: "glpi.tar.gz"
+
+# # Definimos el nombre del archivo de backup de Letsencrypt
+# # /etc/letsencrypt
+# BackupCertificados: "letsencrypt.tar.gz"

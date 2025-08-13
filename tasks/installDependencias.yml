@@ -1,0 +1,44 @@
+---
+
+- name: Instalación de paquete de apache2
+  apt: pkg={{ item }} state=present
+  with_items: "{{ apache2.packages.debian.bullseye_bookworm }}"
+  when: >
+    (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bullseye") or
+    (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bookworm")
+  
+ 
+- name: Asegurarse de que apache2 esté corriendo y habilitado al inicio.
+  service: name=apache2 state=started enabled=yes
+
+- name: Instalación de soporte PHP 8.3
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ php.packages.php83 }}"
+  when: >
+    (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bullseye") or
+    (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bookworm") and
+    ( php_version == "8.3" )
+
+- name: Instalación de soporte PHP 8.2
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ php.packages.php82 }}"
+  when: >
+    (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bullseye") or
+    (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bookworm") and
+    ( php_version == "8.2" )
+
+- name: Instalación de paquete de mysql
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ mysql.packages }}"
+  when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_release'] == "bulseye") or
+        (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_release'] == "focal")
+
+  notify:
+    - check apache2 config
+    - restart apache2

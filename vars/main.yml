@@ -1,0 +1,74 @@
+---
+# vars file for glpi-lamp
+
+##If you need to override the following 2 variables, the first thing to do is comment them out and post them to a file under the host_vars directory
+
+http_port: "80"
+app_user: www-data
+app_group: www-data
+
+
+apache2:
+  packages:
+    debian:
+      bullseye_bookworm:
+        - apache2
+        - apache2-utils
+        - python3-certbot-apache
+        - certbot
+    ubuntu:
+      focal:
+        - apache2
+        - apache2-utils
+        - python3-certbot-apache
+        - certbot
+
+# vars file for php7.4 - When the so is Debian bulseye or ubuntu focal.
+php:
+  packages:
+    php83:
+      - php8.3-fpm      # paquete que contiene el servidor de PHP 8.3
+      - php8.3-mysql    # paquete que contiene el extensión de MySQL para PHP 8.3
+      - php8.3-gd       # paquete que contiene la extensión de GD (Graphical Drawing) para PHP 8.3
+      - php8.3-xml      # paquete que contiene la extensión de XML para PHP 8.3
+      - php8.3-zip      # paquete que contiene la extensión de ZIP para PHP 8.3
+      - php8.3-mbstring # paquete que contiene la extensión de mbstring (Multibyte String) para PHP 8.3
+      - php8.3-intl     # paquete que contiene la extensión de internacionalización (intl) para PHP 8.3
+      - libapache2-mod-php8.3 # paquete que contiene el módulo de Apache para PHP 8.3
+      - php8.3-xmlrpc   # paquete que contiene la extensión de XML-RPC para PHP 8.3
+      - php8.3-json     # paquete que contiene la extensión de JSON para PHP 8.3
+      - php8.3-curl     # paquete que contiene la extensión de cURL para PHP 8.3
+      - php8.3-ldap     # paquete que contiene la extensión de LDAP para PHP 8.3
+      - php8.3-session  # paquete que contiene la extensión de session para PHP 8.3
+      - php8.3-bz2      # paquete que contiene la extensión de bzip2 para PHP 8.3
+      - php8.3-imap     # paquete que contiene la extensión de IMAP para PHP 8.3
+      - php8.3-apcu     # paquete que contiene la extensión de APCu para PHP 8.3
+    php82:
+      - php-json
+      - php8.2-common
+      - php8.2-fpm
+      - php8.2-mysql
+      - php8.2-gd
+      - php8.2-xml
+      - php8.2-zip
+      - php8.2-mbstring
+      - php8.2-intl
+      - libapache2-mod-php8.2
+      - php8.2-xmlrpc
+      - php8.2-curl
+      - php8.2-ldap
+      - php8.2-bz2
+      - php8.2-imap
+      - php8.2-apcu
+ 
+      
+      
+
+
+# Vars file for MySql(server, client)
+mysql:
+  packages:
+    - mariadb-server
+    - mariadb-client
+    - python3-pymysql
+adminwpcli: www-data

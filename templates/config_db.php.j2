@@ -1,0 +1,11 @@
+<?php
+class DB extends DBmysql {
+   public $dbhost     = 'localhost';
+   public $dbuser     = '{{ item.value.glpi_mysql_user }}';
+   public $dbpassword = '{{ item.value.glpi_mysql_password }}';
+   public $dbdefault  = '{{ item.value.glpi_mysql_db }}';
+   public $allow_signed_keys = false;
+   public $allow_datetime = false;
+   public $use_timezones = true;
+   public $use_utf8mb4 = true;
+}

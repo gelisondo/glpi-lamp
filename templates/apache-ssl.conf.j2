@@ -1,0 +1,28 @@
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+
+   ServerAdmin {{ server_admin }}
+   ServerName {{ http_host }}.{{ http_domain }}
+   ServerAlias {{ http_host }}.{{ http_domain }}
+   DocumentRoot /var/www/html/glpi/public
+
+   <Directory /var/www/html/glpi/public>
+         Require all granted
+         RewriteEngine On
+         # Redirect all requests to GLPI router, unless file exists.
+         RewriteCond %{REQUEST_FILENAME} !-f
+         RewriteRule ^(.*)$ index.php [QSA,L]
+    </Directory>
+
+    SSLCertificateFile /etc/letsencrypt/live/{{ http_host }}.{{ http_domain }}/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/{{ http_host }}.{{ http_domain }}/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+
+   ErrorLog ${APACHE_LOG_DIR}/error.log
+   CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+</IfModule>
+
+
+
+

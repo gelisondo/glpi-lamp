@@ -1,0 +1,95 @@
+---
+
+# Agregamos extensiones en php
+
+
+- name: "Uncomment php extensions in php.ini"
+  lineinfile:
+    path: "/etc/php/{{ php_version }}/apache2/php.ini"
+    regexp: '^;extension={{ item }}'
+    line: "extension={{ item }}"
+  with_items:
+    - "{{ php_extensions }}"
+
+- name: Config Apache2 - Enable php modules
+  ansible.builtin.shell:
+    cmd: "/usr/sbin/a2enmod php{{ php_version }}"
+
+- name: Config Apache2 - Enable Modules
+  ansible.builtin.shell:
+    cmd: "a2enmod {{ item }}"
+  loop:
+    - rewrite
+    - ssl
+
+- name: Config Virtualhost http
+  ansible.builtin.template:
+    src: apache.conf.j2
+    dest: "/etc/apache2/sites-available/{{ http_host }}.conf"
+    owner: root
+    mode: 0644
+
+- name: Config Virtualhost https
+  ansible.builtin.template:
+    src: apache-ssl.conf.j2
+    dest: "/etc/apache2/sites-available/{{ http_host }}-ssl.conf"
+    owner: root
+    mode: 0644
+
+
+- name: Extract letsencrypt Bk
+  ansible.builtin.unarchive:
+    src: "{{ inventory_dir }}/host_vars/{{ ansible_limit }}/files/{{ BackupCertificados }}"
+    dest: /etc/
+    owner: root
+    group: root
+    extra_opts: ["--overwrite"]
+
+- name: Extract GLPI bk
+  ansible.builtin.unarchive:
+    src: "{{ inventory_dir }}/host_vars/{{ ansible_limit }}/files/{{ BackupGLPI }}"
+    dest: /var/www/html/
+    owner: www-data
+    group: www-data
+    extra_opts: ["--keep-newer-files"]
+
+- name: Change the owner an permisions
+  ansible.builtin.file:
+    dest: "/var/www/html/{{ http_host }}"
+    state: directory
+    recurse: true
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    #Set directories to 755 and files to 644
+    mode: u=rwX,g=rX,o=rX
+
+- name: Modificamos el archivo de configuración de GLPI
+  ansible.builtin.template:
+    src: config_db.php.j2
+    dest: "/var/www/html/{{ http_host }}/config/config_db.php"
+    owner: www-data
+    group: www-data
+    mode: 0644
+  loop: "{{ site_config_install|dict2items}}"
+
+- name: Configuramos entradas en Crontab para GLPI, todo los dias todos los minutos
+  ansible.builtin.cron:
+    name: "GLPI"
+    minute: "*"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "/usr/bin/php /var/www/html/{{ http_host }}/front/cron.php &> /dev/null"
+    user: www-data
+  
+    
+- name: Enable VirtualHost http
+  ansible.builtin.command:
+    cmd: "a2ensite {{ http_host }}.conf"
+
+- name: Enble VirtualHost https
+  ansible.builtin.command:
+    cmd: "a2ensite {{ http_host }}-ssl.conf"
+
+  notify: restart apache2
