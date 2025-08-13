@@ -51,7 +51,7 @@ php_extensions:
 
 # Variables para la configuración de la base de datos, utilizamos un dicccionario para definir los valores de esta.
 
- Ten en cuenta que si es cribes contraseñas o datos sensibles en el archivo de variables seran expuestos, y en el pero de los casos entrara en la historia de un repositorio Git, para evitar esto es recomendable que utilices el Vault para los secretos y en dicha sección hagas referencia a una variable dentro del vault.
+ Ten encuenta que si escribes contraseñas o datos sensibles en el archivo de variables seran expuestos, y en el pero de los casos entrara en la historia de un repositorio Git, para evitar esto es recomendable que utilices el Vault para los secretos y en dicha sección hagas referencia a una variable dentro del vault.
 
 ```
  site_config_install:
